@@ -1,0 +1,116 @@
+{
+  "type": "object",
+  "title": "PulsarConfig",
+  "properties": {
+    "serviceUrl": {
+      "type": "string",
+      "title": "Pulsar Service URL",
+      "description": "The Pulsar broker service URL to connect to",
+      "examples": ["pulsar://pulsar-1:6650", "pulsar+ssl://pulsar-1:6651"],
+      "format": "uri"
+    },
+    "authentication": {
+      "oneOf": [
+        {
+          "type": "object",
+          "title": "None",
+          "properties": {},
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Token",
+          "required": ["token"],
+          "sensitive": ["token"],
+          "properties": {
+            "token": {
+              "type": "string",
+              "title": "Token",
+              "description": "The authentication token to use for connecting to Pulsar",
+              "format": "var-str"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Basic",
+          "required": ["username", "password"],
+          "sensitive": ["password"],
+          "properties": {
+            "username": {
+              "type": "string",
+              "title": "Username",
+              "description": "The username for Pulsar basic authentication",
+              "format": "var-str"
+            },
+            "password": {
+              "type": "string",
+              "title": "Password",
+              "description": "The password for Pulsar basic authentication",
+              "format": "var-str"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "OAuth2",
+          "required": ["issuerUrl", "credentialsUrl", "audience"],
+          "sensitive": ["credentialsUrl"],
+          "properties": {
+            "issuerUrl": {
+              "type": "string",
+              "title": "Issuer URL",
+              "description": "The OAuth2 issuer URL",
+              "format": "uri"
+            },
+            "credentialsUrl": {
+              "type": "string",
+              "title": "Credentials URL",
+              "description": "The URL or JSON credentials used to obtain an OAuth2 token",
+              "format": "var-str"
+            },
+            "audience": {
+              "type": "string",
+              "title": "Audience",
+              "description": "The OAuth2 audience",
+              "format": "var-str"
+            },
+            "scope": {
+              "type": "string",
+              "title": "Scope",
+              "description": "The optional OAuth2 scope",
+              "format": "var-str"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "tls": {
+      "type": "object",
+      "title": "TLS",
+      "properties": {
+        "certificateChainFile": {
+          "type": "string",
+          "title": "Certificate Chain File",
+          "description": "Path to a PEM certificate chain used to authenticate the Pulsar server",
+          "format": "var-str"
+        },
+        "allowInsecureConnection": {
+          "type": "boolean",
+          "title": "Allow Insecure Connection",
+          "description": "Allow TLS connections without validating the server certificate"
+        },
+        "tlsHostnameVerificationEnabled": {
+          "type": "boolean",
+          "title": "Enable TLS Hostname Verification",
+          "description": "Verify that the TLS certificate hostname matches the Pulsar service hostname"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["serviceUrl", "authentication"]
+}

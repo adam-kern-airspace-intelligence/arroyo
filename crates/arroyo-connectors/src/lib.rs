@@ -28,6 +28,7 @@ pub mod nats;
 pub mod nexmark;
 pub mod polling_http;
 pub mod preview;
+pub mod pulsar;
 pub mod rabbitmq;
 pub mod redis;
 pub mod single_file;
