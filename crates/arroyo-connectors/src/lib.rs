@@ -53,6 +53,7 @@ pub fn connectors() -> HashMap<&'static str, Box<dyn ErasedConnector>> {
         Box::new(nexmark::NexmarkConnector {}),
         Box::new(polling_http::PollingHTTPConnector {}),
         Box::new(preview::PreviewConnector {}),
+        Box::new(pulsar::PulsarConnector),
         Box::new(rabbitmq::RabbitmqConnector {}),
         Box::new(redis::RedisConnector {}),
         Box::new(single_file::SingleFileConnector {}),

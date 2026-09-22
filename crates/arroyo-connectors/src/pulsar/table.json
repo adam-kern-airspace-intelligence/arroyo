@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "title": "PulsarTable",
+  "properties": {
+    "topic": {
+      "type": "string",
+      "title": "Topic",
+      "description": "The Pulsar topic to consume",
+      "format": "autocomplete"
+    },
+    "subscription": {
+      "type": "string",
+      "title": "Subscription",
+      "description": "The durable Pulsar subscription used by this source"
+    },
+    "subscriptionType": {
+      "type": "string",
+      "title": "Subscription Type",
+      "description": "The Pulsar subscription dispatch mode",
+      "enum": ["Exclusive", "Failover", "Shared", "KeyShared"]
+    }
+  },
+  "required": ["topic", "subscription"]
+}

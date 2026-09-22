@@ -9,6 +9,12 @@
       "examples": ["pulsar://pulsar-1:6650", "pulsar+ssl://pulsar-1:6651"],
       "format": "uri"
     },
+    "namespace": {
+      "type": "string",
+      "title": "Pulsar Namespace",
+      "description": "Tenant and namespace used to list topics",
+      "examples": ["public/default", "asi-apps/uni-nitmre-multiplexer"]
+    },
     "authentication": {
       "oneOf": [
         {
@@ -68,7 +74,7 @@
             "credentialsUrl": {
               "type": "string",
               "title": "Credentials URL",
-              "description": "The URL or JSON credentials used to obtain an OAuth2 token",
+              "description": "A file: or data: URL containing OAuth2 client credentials JSON",
               "format": "var-str"
             },
             "audience": {
