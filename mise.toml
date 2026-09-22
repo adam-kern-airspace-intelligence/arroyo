@@ -1,0 +1,75 @@
+min_version = { hard = "2026.3.5", soft = "2026.3.9" }
+
+[settings]
+experimental = true
+lockfile = true
+
+[tools]
+cmake = "3.31.7"
+pnpm = "9.0.6"
+protoc = "21.8"
+python = "3.12"
+rust = "1.95"
+"cargo:refinery_cli" = "0.9.2"
+watchexec = "latest"
+
+[tasks."db:up"]
+run = """
+docker compose -f docker-compose.dev.yml up -d --wait postgres
+docker compose -f docker-compose.dev.yml exec -T postgres psql -U arroyo -d arroyo -v ON_ERROR_STOP=1 -c \"ALTER ROLE arroyo WITH PASSWORD 'arroyo'\"
+"""
+description = "Start the local PostgreSQL database"
+
+[tasks."db:down"]
+run = "docker compose -f docker-compose.dev.yml down"
+description = "Stop the local PostgreSQL database"
+
+[tasks."db:destroy"]
+run = "docker compose -f docker-compose.dev.yml down -v"
+description = "Stop the local PostgreSQL database and remove its data"
+
+[tasks."db:migrate"]
+depends = ["db:up"]
+run = "DATABASE_URL=\"${DATABASE_URL:-postgres://arroyo:arroyo@localhost:5433/arroyo}\" refinery migrate -e DATABASE_URL -p crates/arroyo-api/migrations"
+description = "Apply Arroyo migrations to the local PostgreSQL database"
+
+[tasks."web:install"]
+dir = "webui"
+run = "pnpm install --frozen-lockfile"
+sources = ["package.json", "pnpm-lock.yaml"]
+outputs = ["node_modules/.modules.yaml"]
+description = "Install the console dependencies"
+
+[tasks."web:build"]
+depends = ["web:install"]
+dir = "webui"
+run = "pnpm build"
+sources = ["package.json", "pnpm-lock.yaml", "index.html", "src/**/*", "public/**/*", "*.config.*", "tsconfig*.json"]
+outputs = ["dist/**/*"]
+description = "Build the Arroyo console"
+
+[tasks."web:dev"]
+depends = ["web:install"]
+dir = "webui"
+run = "pnpm dev"
+description = "Run the console Vite server with hot reload on http://localhost:5173"
+
+[tasks.build]
+depends = ["db:migrate", "web:build"]
+run = "DATABASE_URL=\"${DATABASE_URL:-postgres://arroyo:arroyo@localhost:5433/arroyo}\" PYO3_PYTHON=\"$(command -v python3)\" cargo build --all-features"
+sources = ["Cargo.toml", "Cargo.lock", "crates/**/*", "webui/dist/**/*"]
+outputs = ["target/debug/arroyo"]
+description = "Build the Arroyo services and embedded console"
+
+[tasks."build:watch"]
+run = "mise watch build"
+description = "Rebuild Arroyo whenever source files change"
+
+[tasks.dev]
+depends = ["build"]
+run = "DYLD_FALLBACK_LIBRARY_PATH=\"$(mise where python)/lib${DYLD_FALLBACK_LIBRARY_PATH:+:$DYLD_FALLBACK_LIBRARY_PATH}\" ARROYO__DATABASE__TYPE=\"${ARROYO__DATABASE__TYPE:-postgres}\" DATABASE_HOST=\"${DATABASE_HOST:-localhost}\" DATABASE_PORT=\"${DATABASE_PORT:-5433}\" DATABASE_USER=\"${DATABASE_USER:-arroyo}\" DATABASE_PASSWORD=\"${DATABASE_PASSWORD:-arroyo}\" DATABASE_NAME=\"${DATABASE_NAME:-arroyo}\" target/debug/arroyo cluster"
+description = "Run the Arroyo cluster and embedded console on http://localhost:5115"
+
+[tasks."dev:watch"]
+run = "mise watch --on-busy-update=restart dev"
+description = "Rebuild and restart the Arroyo cluster when backend files change"

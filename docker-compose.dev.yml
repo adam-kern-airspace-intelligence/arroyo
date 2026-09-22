@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: arroyo
+      POSTGRES_PASSWORD: arroyo
+      POSTGRES_USER: arroyo
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arroyo -d arroyo"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+    volumes:
+      - arroyo-postgres:/var/lib/postgresql/data
+
+volumes:
+  arroyo-postgres:
