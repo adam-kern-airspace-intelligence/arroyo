@@ -117,6 +117,9 @@ async-nats = "0.38.0"
 nkeys = "0.3.0"
 murmur3 = "0.5.2"
 
+# Pulsar
+pulsar = "6.8.0"
+
 [dev-dependencies]
 tempfile = "3"
 
